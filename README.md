@@ -52,6 +52,3 @@ This is a learning + showcase project — contributions or feedback welcome once
 2-3 days max to finish with polish and maybe another feature
 
 ---
-Express yourself with emoji
-💖 👍 😂 🎉
-Respond quickly and add fun and personality to your emails
