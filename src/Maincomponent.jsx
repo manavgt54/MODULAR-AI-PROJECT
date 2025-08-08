@@ -1,91 +1,47 @@
-import React, { useState } from 'react';
-import queryDB from './utils/queryDB';
-import { questions } from './data/questions.js';
+import { useState } from 'react';
 
-const MainComponent = () => {
+export default function MainComponent() {
   const [input, setInput] = useState('');
   const [response, setResponse] = useState('');
-  const [feedback, setFeedback] = useState(null); // To handle user feedback
 
-  const handleSubmit = async (e) => {
+  async function handleSubmit(e) {
     e.preventDefault();
-    const answer = queryDB(input, questions);
-    setResponse(answer);
-    setFeedback(null); // Reset feedback when a new question is asked
-    setInput('');
 
-    try {
-      await fetch('http://localhost:3001/log', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ input, response: answer })
-      });
-    } catch (err) {
-      console.error('Error logging data:', err);
-    }
-  };
+    const result = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer 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' ,
+      },
+      body: JSON.stringify({
+        model: 'z-ai/glm-4.5-air:free',
+        messages: [
+          { role: 'user', content: input },
+        ],
+      }),
+    });
 
-  const handleFeedback = async (type) => {
-    setFeedback(type);
-    try {
-      await fetch('http://localhost:3001/logs', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ input, response, feedback: type })
-      });
-    } catch (err) {
-      console.error('Error sending feedback:', err);
-    }
-  };
+    const data = await result.json();
+    setResponse(data.choices?.[0]?.message?.content || 'No response');
+  }
 
   return (
-    <div style={{ padding: '2rem', fontFamily: 'monospace' }}>
-      <h2>🧠 Local Reasoning Bot</h2>
-      <form onSubmit={handleSubmit}>
+    <div className="p-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-2">
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Ask something..."
-          style={{ padding: '0.5rem', width: '80%' }}
+          className="border p-2 rounded"
         />
-        <button type="submit" style={{ padding: '0.5rem' }}>
+        <button type="submit" className="bg-blue-500 text-white p-2 rounded">
           Ask
         </button>
       </form>
-
-      {response && (
-        <div style={{ marginTop: '1rem', color: '#333' }}>
-          <strong>Response:</strong> {response}
-
-          <div style={{ marginTop: '0.5rem' }}>
-            <button
-              onClick={() => handleFeedback('up')}
-              style={{
-                marginRight: '0.5rem',
-                backgroundColor: feedback === 'up' ? 'lightgreen' : 'white'
-              }}
-            >
-              👍
-            </button>
-
-            <button
-              onClick={() => handleFeedback('down')}
-              style={{
-                backgroundColor: feedback === 'down' ? 'lightcoral' : 'white'
-              }}
-            >
-              👎
-            </button>
-          </div>
-        </div>
-      )}
+      <div className="mt-4 p-2 border rounded bg-gray-100">
+        {response}
+      </div>
     </div>
   );
-};
-
-export default MainComponent;
+}

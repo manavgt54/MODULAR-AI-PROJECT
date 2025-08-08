@@ -85,6 +85,8 @@ Rules:
 2. Always explain your reasoning process
 3. Format your response clearly with steps and final answer
 4. For complex problems, break them down into smaller parts
+5. Talk in the language of the question
+6. Use markdown formatting for clarity
 
 Provide your response in this format:
 **Problem:** [restate the problem]
