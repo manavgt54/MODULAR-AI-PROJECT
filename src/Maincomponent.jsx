@@ -11,7 +11,7 @@ export default function MainComponent() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer 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' ,
+        'Authorization': 'Bearer sk-or-v1-' ,
       },
       body: JSON.stringify({
         model: 'z-ai/glm-4.5-air:free',
